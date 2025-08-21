@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Home, Settings, Star, Users, CheckSquare, Menu } from 'lucide-react';
 
 const AppSidebar = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const menuItems = [
     { icon: Home, label: 'Início' },

@@ -22,9 +22,11 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <>
+    <div className='flex min-h-screen'>
       <AppSidebar />
-      <Component {...pageProps} />;
-    </>
+      <main className='flex-1 bg-stone-700'>
+        <Component {...pageProps} />
+      </main>
+    </div>
   );
 }

@@ -1,12 +1,12 @@
-import Card from '@/components/Card';
+import Pomodoro from '@/components/Pomodoro';
 import baloo from '@/styles/font';
 
 export default function Home() {
   return (
-    <main
-      className={`grid place-content-center min-h-screen p-24 ${baloo.className}`}
+    <div
+      className={`h-screen flex items-center justify-center ${baloo.className}`}
     >
-      <Card />
-    </main>
+      <Pomodoro />
+    </div>
   );
 }

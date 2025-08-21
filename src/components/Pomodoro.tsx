@@ -1,33 +1,32 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { RotateCcw, Play, Pause } from 'lucide-react';
+import { TIMER_TABS, TimerType } from '@/constants/timer-types';
+import { formatTime } from '@/utils/format-time';
+import TimerTabs from './TimerTabs';
 
-const INITIAL_TIME = 25 * 60;
+const POMODORO_TIME = 25 * 60;
+const SHORT_BREAK_TIME = 5 * 60;
+const LONG_BREAK_TIME = 15 * 60;
 
-function formatTime(seconds: number) {
-  const m = Math.floor(seconds / 60)
-    .toString()
-    .padStart(2, '0');
-  const s = (seconds % 60).toString().padStart(2, '0');
-  return `${m}:${s}`;
-}
-
-const Pomodoro: React.FC = () => {
-  const [time, setTime] = useState(INITIAL_TIME);
+const Pomodoro = () => {
+  const [activeTimer, setActiveTimer] = useState<TimerType>('pomodoro');
+  const [times, setTimes] = useState({
+    pomodoro: POMODORO_TIME,
+    shortBreak: SHORT_BREAK_TIME,
+    longBreak: LONG_BREAK_TIME,
+  });
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const handleTimerChange = (type: TimerType) => {
+    setIsRunning(false);
+    setActiveTimer(type);
+    handleRestart();
+  };
+
   useEffect(() => {
-    if (isRunning && time > 0) {
-      intervalRef.current = setInterval(() => {
-        setTime(prevTime => {
-          if (prevTime <= 1) {
-            clearInterval(intervalRef.current!);
-            setIsRunning(false);
-            return 0;
-          }
-          return prevTime - 1;
-        });
-      }, 1000);
+    if (isRunning) {
+      intervalRef.current = setInterval(decrementTimer, 1000);
     }
 
     return () => {
@@ -35,18 +34,30 @@ const Pomodoro: React.FC = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, time]);
+  }, [isRunning]);
+
+  const decrementTimer = useCallback(() => {
+    setTimes(prevTimes => ({
+      ...prevTimes,
+      [activeTimer]:
+        prevTimes[activeTimer] > 1 ? prevTimes[activeTimer] - 1 : 0,
+    }));
+  }, [activeTimer]);
 
   const handleRestart = () => {
-    setTime(INITIAL_TIME);
+    setTimes(prev => ({
+      ...prev,
+      [activeTimer]:
+        activeTimer === 'pomodoro'
+          ? POMODORO_TIME
+          : activeTimer === 'shortBreak'
+          ? SHORT_BREAK_TIME
+          : LONG_BREAK_TIME,
+    }));
     setIsRunning(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-  };
-
-  const handleStartPause = () => {
-    setIsRunning(prev => !prev);
   };
 
   return (
@@ -55,10 +66,15 @@ const Pomodoro: React.FC = () => {
         <h1 className='text-4xl text-sage'>Pomodoro</h1>
       </div>
 
-      <div className='flex-1 flex items-center justify-center -mt-16'>
-        <div className='w-72 h-72 sm:w-96 sm:h-96 bg-sage rounded-full flex flex-col items-center justify-center shadow-lg relative'>
+      <div className='flex-1 flex flex-col items-center justify-center'>
+        <TimerTabs
+          activeTimer={activeTimer}
+          onTimerChange={handleTimerChange}
+        />
+
+        <div className='w-72 h-72 sm:w-96 sm:h-96 bg-sage rounded-full flex flex-col items-center justify-center shadow-lg relative mt-8'>
           <span className='text-white text-5xl sm:text-6xl font-medium tracking-wider select-none'>
-            {formatTime(time)}
+            {formatTime(times[activeTimer])}
           </span>
 
           <div className='absolute bottom-8 left-0 w-full flex justify-center gap-4'>
@@ -70,7 +86,7 @@ const Pomodoro: React.FC = () => {
             </button>
 
             <button
-              onClick={handleStartPause}
+              onClick={() => setIsRunning(prev => !prev)}
               className='p-3 rounded-full bg-white/10 backdrop-blur-sm text-gray-50 hover:bg-white/20 transition-all duration-200'
             >
               {isRunning ? <Pause size={24} /> : <Play size={24} />}

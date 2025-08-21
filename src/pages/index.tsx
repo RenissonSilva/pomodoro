@@ -1,15 +1,10 @@
 import Card from '@/components/Card';
-import { Poppins } from 'next/font/google';
-
-const poppins = Poppins({
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  subsets: ['latin'],
-});
+import baloo from '@/styles/font';
 
 export default function Home() {
   return (
     <main
-      className={`grid place-content-center min-h-screen p-24 ${poppins.className}`}
+      className={`grid place-content-center min-h-screen p-24 ${baloo.className}`}
     >
       <Card />
     </main>

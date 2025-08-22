@@ -166,7 +166,7 @@ const Pomodoro = () => {
                 cx='100'
                 cy='100'
                 r='90'
-                stroke='rgba(255, 255, 255, 0.2)'
+                stroke='rgba(255, 255, 255, 0.1)'
                 strokeWidth='2'
                 fill='none'
               />
@@ -175,7 +175,7 @@ const Pomodoro = () => {
                 cx='100'
                 cy='100'
                 r='90'
-                stroke='rgba(255, 255, 255, 0.9)'
+                stroke='rgba(255, 255, 255, 0.6)'
                 strokeWidth='2'
                 fill='none'
                 strokeLinecap='round'

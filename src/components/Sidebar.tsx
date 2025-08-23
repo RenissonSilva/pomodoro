@@ -1,15 +1,27 @@
 import { useState } from 'react';
-import { Home, Settings, Star, Users, CheckSquare, Menu } from 'lucide-react';
+import {
+  Home,
+  Settings,
+  Star,
+  Users,
+  CheckSquare,
+  Menu,
+  X,
+} from 'lucide-react';
 
-const AppSidebar = () => {
+interface AppSidebarProps {
+  onSettingsClick: () => void;
+}
+
+const AppSidebar = ({ onSettingsClick }: AppSidebarProps) => {
   const [collapsed, setCollapsed] = useState(true);
 
   const menuItems = [
-    { icon: Home, label: 'Início' },
-    { icon: CheckSquare, label: 'Tarefas' },
-    { icon: Users, label: 'Grupos' },
-    { icon: Settings, label: 'Configurações' },
-    { icon: Star, label: 'Premium' },
+    { icon: Home, label: 'Início', action: () => {} },
+    { icon: CheckSquare, label: 'Tarefas', action: () => {} },
+    { icon: Users, label: 'Grupos', action: () => {} },
+    { icon: Settings, label: 'Configurações', action: onSettingsClick }, // aqui chama a função
+    { icon: Star, label: 'Premium', action: () => {} },
   ];
 
   return (
@@ -36,6 +48,7 @@ const AppSidebar = () => {
           {menuItems.map((item, index) => (
             <button
               key={index}
+              onClick={item.action}
               className={`w-full flex items-center px-3 py-3 mb-2 rounded-lg transition-all duration-200 hover:bg-neutral-700 text-left group ${
                 collapsed && 'justify-center'
               }`}

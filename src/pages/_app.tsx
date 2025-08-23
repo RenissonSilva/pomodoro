@@ -4,12 +4,13 @@ import type { AppProps } from 'next/app';
 import SettingsDrawer from '@/drawer/SettingsDrawer';
 
 import '@/styles/globals.css';
+import { baloo } from '@/styles/font';
 
 export default function App({ Component, pageProps }: AppProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
-    <div className='flex min-h-screen relative'>
+    <div className={`${baloo.className} flex min-h-screen relative`}>
       <AppSidebar onSettingsClick={() => setIsSettingsOpen(true)} />
 
       <main className='flex-1 bg-stone-700 relative'>

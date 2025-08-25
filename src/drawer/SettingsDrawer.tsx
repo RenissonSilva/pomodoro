@@ -18,9 +18,14 @@ export default function SettingsDrawer({ isSettingsOpen, setIsSettingsOpen }) {
               ${isSettingsOpen ? 'translate-x-0' : 'translate-x-full'}
             `}
       >
-        <div className='flex justify-between items-center mb-4'>
-          <h2 className='text-xl font-semibold'>Configurações</h2>
-          <button onClick={() => setIsSettingsOpen(false)}>
+        <div className='flex items-center mb-4'>
+          <h2 className='flex-1 text-xl font-semibold text-white'>
+            Configurações
+          </h2>
+          <button
+            onClick={() => setIsSettingsOpen(false)}
+            className='text-gray-400 hover:text-white transition-colors'
+          >
             <X size={24} />
           </button>
         </div>

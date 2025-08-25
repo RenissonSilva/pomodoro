@@ -20,7 +20,7 @@ const AppSidebar = ({ onSettingsClick }: AppSidebarProps) => {
     { icon: Home, label: 'Início', action: () => {} },
     { icon: CheckSquare, label: 'Tarefas', action: () => {} },
     { icon: Users, label: 'Grupos', action: () => {} },
-    { icon: Settings, label: 'Configurações', action: onSettingsClick }, // aqui chama a função
+    { icon: Settings, label: 'Configurações', action: onSettingsClick },
     { icon: Star, label: 'Premium', action: () => {} },
   ];
 

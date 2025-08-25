@@ -15,12 +15,25 @@ export default function App({ Component, pageProps }: AppProps) {
 
       <main className='flex-1 bg-stone-700 relative'>
         <Component {...pageProps} />
+      </main>
 
+      {isSettingsOpen && (
+        <div
+          className='fixed inset-0 bg-black/50 z-40 transition-opacity'
+          onClick={() => setIsSettingsOpen(false)}
+        />
+      )}
+
+      <div
+        className={`fixed right-0 top-0 h-full w-80 bg-neutral-800 shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+          isSettingsOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
         <SettingsDrawer
           isSettingsOpen={isSettingsOpen}
           setIsSettingsOpen={setIsSettingsOpen}
         />
-      </main>
+      </div>
     </div>
   );
 }

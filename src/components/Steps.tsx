@@ -10,7 +10,7 @@ const Steps = ({ currentStep, totalSteps = 4 }: StepsProps) => {
     <div className='relative flex items-center justify-center gap-3'>
       <div className='absolute h-1 bg-white/10 w-[calc(100%-2rem)] rounded-full'>
         <div
-          className='h-full bg-sage rounded-full transition-all duration-300'
+          className='h-full bg-rose-400 rounded-full transition-all duration-300'
           style={{ width: `${(currentStep / totalSteps) * 100}%` }}
         />
       </div>
@@ -24,7 +24,7 @@ const Steps = ({ currentStep, totalSteps = 4 }: StepsProps) => {
               transition-all duration-300 z-10
               ${
                 index < currentStep
-                  ? 'bg-sage text-white scale-110'
+                  ? 'bg-rose-400 text-white scale-110'
                   : 'bg-white/10 text-gray-400'
               }
             `}

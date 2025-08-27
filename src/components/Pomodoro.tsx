@@ -4,6 +4,7 @@ import { TimerType } from '@/constants/timer-types';
 import { formatTime } from '@/utils/format-time';
 import TimerTabs from './TimerTabs';
 import Steps from './Steps';
+import { getTimerBgColorClass, getTimerColorClass } from '@/utils/timer-utils';
 
 const TIMER_PRESETS = {
   pomodoro: 0.05 * 60,
@@ -22,8 +23,8 @@ const Pomodoro = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const isTransitioningRef = useRef(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Calcula o progresso baseado no tempo restante (100% = cheio, 0% = vazio)
   const getProgress = () => {
     const totalTime = TIMER_PRESETS[activeTimer];
     const currentTime = times[activeTimer];
@@ -31,25 +32,10 @@ const Pomodoro = () => {
     return Math.min(Math.max(progress, 0), 100);
   };
 
-  const handleTimerChange = (type: TimerType) => {
-    setIsRunning(false);
-    setActiveTimer(type);
-    resetCurrentTimer(type);
-    isTransitioningRef.current = false;
-  };
-
-  const resetCurrentTimer = (timerType: TimerType = activeTimer) => {
-    const initialTime = TIMER_PRESETS[timerType];
-
-    setTimes(prev => ({
-      ...prev,
-      [timerType]: initialTime,
-    }));
-  };
-
   const switchToNextTimer = useCallback(() => {
     if (isTransitioningRef.current) return;
     isTransitioningRef.current = true;
+    setIsTransitioning(true);
 
     setTimeout(() => {
       if (activeTimer === 'pomodoro') {
@@ -73,7 +59,6 @@ const Pomodoro = () => {
           return newStep;
         });
       } else {
-        // Pausa terminou, volta para pomodoro
         if (activeTimer === 'longBreak') {
           setCurrentStep(0);
         }
@@ -85,13 +70,34 @@ const Pomodoro = () => {
         }));
       }
 
-      // Inicia o próximo timer após um pequeno delay
       setTimeout(() => {
+        setIsTransitioning(false);
         setIsRunning(true);
         isTransitioningRef.current = false;
-      }, 200);
-    }, 100);
+      }, 300);
+    }, 300);
   }, [activeTimer]);
+
+  const handleTimerChange = (type: TimerType) => {
+    setIsRunning(false);
+    setIsTransitioning(true);
+
+    setTimeout(() => {
+      setActiveTimer(type);
+      resetCurrentTimer(type);
+      isTransitioningRef.current = false;
+      setIsTransitioning(false);
+    }, 200);
+  };
+
+  const resetCurrentTimer = (timerType: TimerType = activeTimer) => {
+    const initialTime = TIMER_PRESETS[timerType];
+
+    setTimes(prev => ({
+      ...prev,
+      [timerType]: initialTime,
+    }));
+  };
 
   useEffect(() => {
     if (isRunning && !isTransitioningRef.current) {
@@ -100,7 +106,6 @@ const Pomodoro = () => {
           const currentTime = prevTimes[activeTimer];
 
           if (currentTime <= 1) {
-            // Para o timer e inicia a transição
             if (intervalRef.current) {
               clearInterval(intervalRef.current);
             }
@@ -119,7 +124,6 @@ const Pomodoro = () => {
         });
       }, 1000);
     } else {
-      // Limpa o intervalo quando não está rodando
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
@@ -144,7 +148,9 @@ const Pomodoro = () => {
   return (
     <div className='h-full w-full flex flex-col'>
       <div className='p-6'>
-        <h1 className='text-4xl text-[#679F96]'>Pomodoro</h1>
+        <h1 className={`text-4xl ${getTimerColorClass(activeTimer)}`}>
+          Pomodoro
+        </h1>
       </div>
 
       <div className='flex-1 flex flex-col items-center justify-center'>
@@ -154,29 +160,36 @@ const Pomodoro = () => {
         />
 
         <div className='relative my-16'>
-          {/* Círculo principal do timer */}
-          <div className='w-72 h-72 sm:w-96 sm:h-96 bg-[#679F96] rounded-full flex flex-col items-center justify-center shadow-lg relative'>
-            {/* SVG para o anel de progresso - posicionado dentro do círculo */}
+          <div
+            className={`
+              w-72 h-72 sm:w-96 sm:h-96 rounded-full flex flex-col items-center justify-center shadow-lg relative 
+              transition-all duration-500 ease-in-out transform
+              ${getTimerBgColorClass(activeTimer)}
+              ${isTransitioning ? 'scale-105 animate-pulse' : 'scale-100'}
+            `}
+          >
             <svg
-              className='absolute inset-0 w-full h-full transform -rotate-90'
+              className={`
+                absolute inset-0 w-full h-full transform -rotate-90
+                transition-opacity duration-300
+                ${isTransitioning ? 'opacity-50' : 'opacity-100'}
+              `}
               viewBox='0 0 200 200'
             >
-              {/* Círculo de fundo (semi-transparente) */}
               <circle
                 cx='100'
                 cy='100'
                 r='90'
                 stroke='rgba(255, 255, 255, 0.1)'
-                strokeWidth='2'
+                strokeWidth='3'
                 fill='none'
               />
-              {/* Círculo de progresso */}
               <circle
                 cx='100'
                 cy='100'
                 r='90'
-                stroke='rgba(255, 255, 255, 0.6)'
-                strokeWidth='2'
+                stroke='rgba(255, 255, 255, 0.8)'
+                strokeWidth='3'
                 fill='none'
                 strokeLinecap='round'
                 strokeDasharray={2 * Math.PI * 90}
@@ -184,26 +197,59 @@ const Pomodoro = () => {
                 style={{
                   transition: isRunning
                     ? 'stroke-dashoffset 1s linear'
-                    : 'stroke-dashoffset 0.3s ease',
+                    : 'stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}
               />
             </svg>
 
-            <span className='text-white text-5xl sm:text-6xl font-medium tracking-wider select-none relative z-10'>
+            <span
+              className={`
+                text-white text-5xl sm:text-6xl font-medium tracking-wider select-none relative z-10
+                transition-all duration-300
+                ${
+                  isTransitioning
+                    ? 'scale-110 opacity-75'
+                    : 'scale-100 opacity-100'
+                }
+              `}
+            >
               {formatTime(times[activeTimer])}
             </span>
 
-            <div className='absolute bottom-14 left-0 w-full flex justify-center gap-4 z-10'>
+            <div
+              className={`
+                absolute bottom-14 left-0 w-full flex justify-center gap-4 z-10
+                transition-all duration-300
+              `}
+            >
               <button
                 onClick={handleRestart}
-                className='p-3 rounded-full bg-white/10 backdrop-blur-sm text-gray-50 hover:bg-white/20 transition-all duration-200'
+                disabled={isTransitioning}
+                className={`
+                  p-3 rounded-full bg-white/10 backdrop-blur-sm text-gray-50 
+                  transition-all duration-200
+                  ${
+                    isTransitioning
+                      ? 'cursor-not-allowed opacity-50'
+                      : 'hover:bg-white/20 hover:scale-105'
+                  }
+                `}
               >
                 <RotateCcw size={24} />
               </button>
 
               <button
                 onClick={() => setIsRunning(prev => !prev)}
-                className='p-3 rounded-full bg-white/10 backdrop-blur-sm text-gray-50 hover:bg-white/20 transition-all duration-200'
+                disabled={isTransitioning}
+                className={`
+                  p-3 rounded-full bg-white/10 backdrop-blur-sm text-gray-50 
+                  transition-all duration-200
+                  ${
+                    isTransitioning
+                      ? 'cursor-not-allowed opacity-50'
+                      : 'hover:bg-white/20 hover:scale-105'
+                  }
+                `}
               >
                 {isRunning ? <Pause size={24} /> : <Play size={24} />}
               </button>
@@ -211,7 +257,13 @@ const Pomodoro = () => {
           </div>
         </div>
 
-        <Steps currentStep={currentStep} />
+        <div
+          className={`transition-all duration-300 ${
+            isTransitioning ? 'scale-105' : 'scale-100'
+          }`}
+        >
+          <Steps currentStep={currentStep} />
+        </div>
       </div>
     </div>
   );

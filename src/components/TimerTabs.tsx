@@ -1,4 +1,5 @@
 import { TIMER_TABS, TimerType } from '@/constants/timer-types';
+import { getTimerBgColorClass } from '@/utils/timer-utils';
 
 interface TimerTabsProps {
   activeTimer: TimerType;
@@ -15,7 +16,7 @@ export const TimerTabs = ({ activeTimer, onTimerChange }: TimerTabsProps) => {
             onClick={() => onTimerChange(type as TimerType)}
             className={`px-4 py-2 rounded-md transition-all duration-200 ${
               activeTimer === type
-                ? 'bg-sage text-white'
+                ? getTimerBgColorClass(activeTimer)
                 : 'text-gray-300 hover:bg-white/5'
             }`}
           >

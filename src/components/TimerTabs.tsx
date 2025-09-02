@@ -16,7 +16,7 @@ export const TimerTabs = ({ activeTimer, onTimerChange }: TimerTabsProps) => {
             onClick={() => onTimerChange(type as TimerType)}
             className={`px-4 py-2 rounded-md transition-all duration-200 ${
               activeTimer === type
-                ? getTimerBgColorClass(activeTimer)
+                ? getTimerBgColorClass(activeTimer) + ' text-white'
                 : 'text-gray-300 hover:bg-white/5'
             }`}
           >

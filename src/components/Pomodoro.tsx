@@ -4,7 +4,6 @@ import { TimerType } from '@/constants/timer-types';
 import { formatTime } from '@/utils/format-time';
 import TimerTabs from './TimerTabs';
 import Steps from './Steps';
-import { getTimerBgColorClass, getTimerColorClass } from '@/utils/timer-utils';
 
 const TIMER_PRESETS = {
   pomodoro: 0.05 * 60,
@@ -88,6 +87,32 @@ const Pomodoro = () => {
       isTransitioningRef.current = false;
       setIsTransitioning(false);
     }, 200);
+  };
+
+  const getTimerColorClass = (activeTimer: TimerType): string => {
+    switch (activeTimer) {
+      case 'pomodoro':
+        return `text-rose-400`;
+      case 'shortBreak':
+        return `text-sage`;
+      case 'longBreak':
+        return `text-blue-300`;
+      default:
+        return `text-sage`;
+    }
+  };
+
+  const getTimerBgColorClass = (activeTimer: TimerType): string => {
+    switch (activeTimer) {
+      case 'pomodoro':
+        return `bg-rose-400`;
+      case 'shortBreak':
+        return `bg-sage`;
+      case 'longBreak':
+        return `bg-blue-300`;
+      default:
+        return `bg-sage`;
+    }
   };
 
   const resetCurrentTimer = (timerType: TimerType = activeTimer) => {
